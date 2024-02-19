@@ -1,0 +1,5 @@
+name = "node-example"
+version = "0.1.0"
+description = "An example Stencila plugin written in Node.js"
+homepage = "https://github.com/stencila/plugin-example-node"
+runtime = "node>=16"
