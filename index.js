@@ -153,17 +153,16 @@ class Plugin {
         });
     }
     /**
-     * Run the plugin based on arguments passed to the script
+     * Run the plugin based on environment variables
      */
     run() {
         return __awaiter(this, void 0, void 0, function* () {
-            const args = process.argv.slice(2);
-            const protocol = args[0];
+            const protocol = process.env.STENCILA_TRANSPORT;
             if (protocol == "stdio") {
                 this.listenStdio();
             }
             else if (protocol == "http") {
-                this.listenHttp(parseInt(args[1]), args[2]);
+                this.listenHttp(parseInt(process.env.STENCILA_PORT), process.env.STENCILA_TOKEN);
             }
             else {
                 throw Error(`Unknown protocol: ${protocol}`);

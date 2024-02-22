@@ -16,7 +16,7 @@ import readline from "readline";
 export class Plugin {
   /**
    * Get the health of the plugin
-   * 
+   *
    * At present this method is only used to check communication with
    * the plugin. In the future, the expected response object may be used
    * for more detailed statistics about resource usage etc by the plugin.
@@ -150,15 +150,17 @@ export class Plugin {
   }
 
   /**
-   * Run the plugin based on arguments passed to the script
+   * Run the plugin based on environment variables
    */
   public async run(): Promise<void> {
-    const args = process.argv.slice(2);
-    const protocol = args[0];
+    const protocol = process.env.STENCILA_TRANSPORT;
     if (protocol == "stdio") {
       this.listenStdio();
     } else if (protocol == "http") {
-      this.listenHttp(parseInt(args[1]), args[2]);
+      this.listenHttp(
+        parseInt(process.env.STENCILA_PORT!),
+        process.env.STENCILA_TOKEN!
+      );
     } else {
       throw Error(`Unknown protocol: ${protocol}`);
     }

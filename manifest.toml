@@ -1,8 +1,8 @@
 name = "node-example"
 version = "0.1.0"
-description = "Example plugin written in Node.js"
+description = "Example of a plugin written in Node.js"
 home = "https://github.com/stencila/plugin-example-node"
 install = "https://github.com/stencila/plugin-example-node"
 runtime = "node>=16"
-command = "npx run {{transport}} {{port}} {{token}}"
 transports = ["stdio", "http"]
+command = "npx run"
