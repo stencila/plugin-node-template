@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "description": "An example Stencila plugin written in Node.js",
   "main": "index.js",
+  "bin": {
+    "run": "index.js"
+  },
   "scripts": {
     "build": "tsc"
   },
@@ -12,6 +15,7 @@
   ],
   "license": "Apache-2.0",
   "devDependencies": {
+    "@types/node": "^20.11.19",
     "typescript": "^5.3.3"
   }
 }

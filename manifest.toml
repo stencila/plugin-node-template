@@ -4,3 +4,5 @@ description = "Example plugin written in Node.js"
 home = "https://github.com/stencila/plugin-example-node"
 install = "https://github.com/stencila/plugin-example-node"
 runtime = "node>=16"
+command = "npx run {{transport}} {{port}} {{token}}"
+transports = ["stdio", "http"]
