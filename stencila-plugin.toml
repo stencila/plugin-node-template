@@ -6,3 +6,6 @@ install = "https://github.com/stencila/plugin-example-node"
 runtime = "node>=16"
 transports = ["stdio", "http"]
 command = "npx run"
+
+[[kernels]]
+name = "allcaps"

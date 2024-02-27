@@ -16,6 +16,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Plugin = void 0;
 const http_1 = __importDefault(require("http"));
 const readline_1 = __importDefault(require("readline"));
+const types_1 = require("@stencila/types");
 /**
  * A base plugin class for Stencila plugins built with Node.js
  *
@@ -43,6 +44,331 @@ class Plugin {
         });
     }
     /**
+     * Start an instance of a kernel
+     *
+     * This method is called by Stencila when a kernel instance is
+     * started. Because Stencila starts a new plugin instance for each
+     * kernel instance, this method only needs to be implemented for plugins
+     * that provide more than one kernel or that need to instantiate some state
+     * for a kernel instance (i.e. a kernel that is capable
+     * of storing variables).
+     *
+     * This default implementation simply returns the same name as
+     * supplied (i.e. the kernel instance will have the same
+     * name as the kernel).
+     *
+     * @param kernel The name of the kernel to start an instance for
+     *
+     * @returns {Object}
+     * @property instance The name of the kernel instance that was started
+     */
+    kernelStart(kernel) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return { instance: kernel };
+        });
+    }
+    /**
+     * JSON-RPC interface for `kernelStart`
+     *
+     * @param {Object}
+     * @property kernel The name of the kernel to start an instance for
+     *
+     * @returns {Object}
+     * @property instance The name of the kernel instance that was started
+     */
+    kernel_start({ kernel }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.kernelStart(kernel);
+        });
+    }
+    /**
+     * Stop a kernel instance
+     *
+     * This method is called by Stencila when a kernel instance is
+     * stopped because it is no longer needed. Because Stencila will also
+     * stop the plugin instance at that time, this method only needs to be
+     * implemented for plugins that host more than one kernel instance at a time,
+     * or that need to perform clean up for a stopped kernel instance.
+     *
+     * This default implementation does nothing.
+     *
+     * @param instance The name of the kernel instance to stop
+     */
+    kernelStop(instance) {
+        return __awaiter(this, void 0, void 0, function* () { });
+    }
+    /**
+     * JSON-RPC interface for `kernelStop`
+     *
+     * @param {Object}
+     * @property instance The name of the kernel instance to stop
+     */
+    kernel_stop({ instance, }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.kernelStop(instance);
+        });
+    }
+    /**
+     * Get information about a kernel instance
+     *
+     * This method is called by Stencila to obtain information about a
+     * kernel instance while it is running. It must be implemented by
+     * all plugins that provide one or more kernels.
+     *
+     * This default implementation throws an error to indicate that
+     * it has not been overridden.
+     *
+     * @param instance The name of the kernel instance to get information for
+     */
+    kernelInfo(instance) {
+        return __awaiter(this, void 0, void 0, function* () {
+            throw Error("Method `kernelInfo` must be overridden by plugins that provide one or more kernels");
+        });
+    }
+    /**
+     * JSON-RPC interface for `kernelInfo`
+     *
+     * @param {Object}
+     * @property instance The name of the kernel instance to get information for
+     */
+    kernel_info({ instance, }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.kernelInfo(instance);
+        });
+    }
+    /**
+     * Get a list of packages available in a kernel instance
+     *
+     * This method is called by Stencila to obtain a list of packages
+     * available in a kernel instance. This is used for improving
+     * assistant code generation (reducing hallucination of packages)
+     * and other purposes. This method should be implemented by plugins
+     * that provide kernels which have the concept of installable packages.
+     *
+     * This default implementation returns an empty list.
+     *
+     * @param instance The name of the kernel instance to list packages for
+     */
+    kernelPackages(instance) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return [];
+        });
+    }
+    /**
+     * JSON-RPC interface for `kernelPackages`
+     *
+     * @param {Object}
+     * @property instance The name of the kernel instance to list packages for
+     */
+    kernel_packages({ instance, }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.kernelPackages(instance);
+        });
+    }
+    /**
+     * Execute code in a kernel instance
+     *
+     * This method is called by Stencila when executing `CodeChunk`s.
+     * It should be implemented for most kernels. If the plugin provides
+     * more than one kernel, this method will need to branch based on the
+     * type of the kernel instance.
+     *
+     * This default implementation returns no outputs or messages.
+     *
+     * @param code The code to execute
+     * @param instance The name of the kernel instance to execute the code in
+     *
+     * @return {Object}
+     * @property outputs The outputs from executing the code
+     * @property messages The messages associated with executing the code
+     */
+    kernelExecute(code, instance) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return {
+                outputs: [],
+                messages: [],
+            };
+        });
+    }
+    /**
+     * JSON-RPC interface for `kernelExecute`
+     *
+     * @param {Object}
+     * @property code The code to execute
+     * @property instance The name of the kernel instance to execute the code in
+     *
+     * @return {Object}
+     * @property outputs The outputs from executing the code
+     * @property messages The messages associated with executing the code
+     */
+    kernel_execute({ code, instance, }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.kernelExecute(code, instance);
+        });
+    }
+    /**
+     * Evaluate code in a kernel instance
+     *
+     * This method is called by Stencila when evaluating code expressions
+     * in `CodeExpression`, `ForBlock` and other node types.
+     * It should be implemented for most kernels. If the plugin provides
+     * more than one kernel, this method will need to branch based on the
+     * type of the kernel instance.
+     *
+     * This default implementation returns no output or messages.
+     *
+     * @param code The code to evaluate
+     * @param instance The name of the kernel instance to evaluate the code in
+     *
+     * @return {Object}
+     * @property output The output from evaluating the code
+     * @property messages The messages associated with evaluating the code
+     */
+    kernelEvaluate(code, instance) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return {
+                output: [],
+                messages: [],
+            };
+        });
+    }
+    /**
+     * JSON-RPC interface for `kernelEvaluate`
+     *
+     * @param {Object}
+     * @property code The code to evaluate
+     * @property instance The name of the kernel instance to evaluate the code in
+     *
+     * @return {Object}
+     * @property output The output from evaluating the code
+     * @property messages The messages associated with evaluating the code
+     */
+    kernel_evaluate({ code, instance, }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.kernelEvaluate(code, instance);
+        });
+    }
+    /**
+     * Get a list of variables available in a kernel instance
+     *
+     * This method is called by Stencila to obtain a list of variables
+     * available in a kernel instance. This is used for improving
+     * assistant code generation (reducing hallucination of variables)
+     * and other purposes. This method should be implemented by plugins
+     * that provide kernels which maintain variables as part of the kernel
+     * state.
+     *
+     * This default implementation returns an empty list.
+     *
+     * @param instance The name of the kernel instance to list variables for
+     */
+    kernelList(instance) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return [];
+        });
+    }
+    /**
+     * JSON-RPC interface for `kernelList`
+     *
+     * @param {Object}
+     * @property instance The name of the kernel instance to list variables for
+     */
+    kernel_list({ instance, }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.kernelList(instance);
+        });
+    }
+    /**
+     * Get a variable from a kernel instance
+     *
+     * This method is called by Stencila to obtain a variables so it
+     * can be displayed or "mirrored" to another kernel. This method should
+     * be implemented by plugins that provide kernels which maintain variables
+     * as part of the kernel state.
+     *
+     * This default implementation returns `null` (the return value when a
+     * variable does not exist).
+     *
+     * @param name The name of the variable
+     * @param instance The name of the kernel instance get the variable from
+     */
+    kernelGet(name, instance) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return null;
+        });
+    }
+    /**
+     * JSON-RPC interface for `kernelGet`
+     *
+     * @param {Object}
+     * @property name The name of the variable
+     * @property instance The name of the kernel instance get the variable from
+     */
+    kernel_get({ name, instance, }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.kernelGet(name, instance);
+        });
+    }
+    /**
+     * Set a variable in a kernel instance
+     *
+     * This method is called by Stencila to set `Parameter` values or
+     * to "mirror" variable from another kernel. This method should
+     * be implemented by plugins that provide kernels which maintain variables
+     * as part of the kernel state.
+     *
+     * This default implementation does nothing.
+     *
+     * @param name The name of the variable
+     * @param value The value of the node
+     * @param instance The name of the kernel instance to set the variable in
+     */
+    kernelSet(name, value, instance) {
+        return __awaiter(this, void 0, void 0, function* () { });
+    }
+    /**
+     * JSON-RPC interface for `kernelSet`
+     *
+     * @param {Object}
+     * @property name The name of the variable
+     * @property value The value of the node
+     * @property instance The name of the kernel instance to list variables for
+     */
+    kernel_set({ name, value, instance, }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.kernelSet(name, value, instance);
+        });
+    }
+    /**
+     * Remove a variable from a kernel instance
+     *
+     * This method is called by Stencila to keep the variables in a kernel
+     * instance in sync with the variables defined in the code in a document.
+     * For example, if a `CodeChunk` that declares a variable is removed from
+     * from the document, then the variable should be removed from the kernel
+     * (so that it is not accidentally reused later).
+     *
+     * This default implementation does nothing.
+     *
+     * @param name The name of the variable
+     * @param instance The name of the kernel instance to remove the variable from
+     */
+    kernelRemove(name, instance) {
+        return __awaiter(this, void 0, void 0, function* () { });
+    }
+    /**
+     * JSON-RPC interface for `kernelRemove`
+     *
+     * @param {Object}
+     * @property name The name of the variable
+     * @property instance The name of the kernel instance to remove the variable from
+     */
+    kernel_remove({ name, instance, }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.kernelRemove(name, instance);
+        });
+    }
+    /**
      * Handle a JSON-RPC request and return a JSON-RPC response
      */
     handleRequest(requestJson) {
@@ -61,21 +387,22 @@ class Plugin {
             const func = this[method];
             if (typeof func === "function") {
                 try {
-                    const result = yield func(params);
+                    const result = yield func.call(this, params);
                     return successResponse(id, result);
                 }
                 catch (error) {
-                    return errorResponse(id, -32603, "Internal error");
+                    return errorResponse(id, -32603, `Internal error: ${error}`);
                 }
             }
             else {
-                return errorResponse(id, -32601, "Method not found");
+                return errorResponse(id, -32601, `Method \`${method}\` not found`);
             }
             function successResponse(id, result) {
-                return JSON.stringify({ id, result });
+                // Result must always be defined (i.e. not `undefined`) for success responses
+                return JSON.stringify({ id, result: result !== null && result !== void 0 ? result : null });
             }
             function errorResponse(id, code, message) {
-                return JSON.stringify({ id, code, message });
+                return JSON.stringify({ id, error: { code, message } });
             }
         });
     }
@@ -175,6 +502,27 @@ exports.Plugin = Plugin;
  * An example Stencila plugin written in Node.js
  */
 class ExamplePlugin extends Plugin {
+    kernelInfo() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return (0, types_1.softwareApplication)("allcaps");
+        });
+    }
+    kernelExecute(code) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return {
+                outputs: [code.toUpperCase()],
+                messages: [],
+            };
+        });
+    }
+    kernelEvaluate(code) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return {
+                output: code.toUpperCase(),
+                messages: [],
+            };
+        });
+    }
 }
 if (require.main === module) {
     new ExamplePlugin().run().catch(console.error);
