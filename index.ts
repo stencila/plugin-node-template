@@ -25,7 +25,7 @@ type KernelInstanceName = string;
  * in the `@stencila/node` package. But for now, while we are developing
  * and testing the API, this is the most convenient place for it to live.
  */
-export class Plugin {
+export abstract class Plugin {
   /**
    * Get the health of the plugin
    *
@@ -463,7 +463,7 @@ export class Plugin {
 
     function successResponse(id: string, result: unknown): string {
       // Result must always be defined (i.e. not `undefined`) for success responses
-      return JSON.stringify({ id, result: result ?? null });
+      return JSON.stringify({ jsonrpc: "2.0", id, result: result ?? null });
     }
 
     function errorResponse(
@@ -471,7 +471,7 @@ export class Plugin {
       code: number,
       message: string
     ): string {
-      return JSON.stringify({ id, error: { code, message } });
+      return JSON.stringify({ jsonrpc: "2.0", id, error: { code, message } });
     }
   }
 
