@@ -1,11 +1,17 @@
-name = "node-example"
+name = "node-template"
 version = "0.1.0"
 description = "Example of a plugin written in Node.js"
-home = "https://github.com/stencila/plugin-example-node"
-install = "https://github.com/stencila/plugin-example-node"
+home = "https://github.com/stencila/plugin-node-template"
+install = "https://github.com/stencila/plugin-node-template"
 runtime = "node>=16"
 transports = ["stdio", "http"]
 command = "npx run"
 
 [[kernels]]
-name = "allcaps"
+name = "echo-node"
+
+[[assistants]]
+id = "stencila/echo-node"
+name = "Node.js Echo Assistant"
+content-format = "markdown"
+system-prompt = true

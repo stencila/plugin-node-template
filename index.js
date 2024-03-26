@@ -369,6 +369,78 @@ class Plugin {
         });
     }
     /**
+     * Execute an instruction using an assistant
+     *
+     * This method is called by Stencila before executing an
+     * `InstructionBlock` or `InstructionInline` node so that the
+     * assistant can provide a system prompt template to delegates.
+     *
+     * It receives a `GenerateTask` and `GenerateOptions` and should
+     * return a `string`. This default implementation returns an
+     * empty string.
+     *
+     * @param task The task to create a system prompt template for
+     * @param options Options for generation
+     * @param assistant The id of the assistant that should create the system prompt
+     *
+     * @return string
+     */
+    assistantSystemPrompt(task, options, assistant) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return "";
+        });
+    }
+    /**
+     * JSON-RPC interface for `assistantSystemPrompt`
+     *
+     * @param {Object}
+     * @param task The task to create a system prompt template for
+     * @param options Options for generation
+     * @param assistant The id of the assistant that should create the system prompt
+     *
+     * @return string
+     */
+    assistant_system_prompt({ task, options, assistant, }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.assistantSystemPrompt(task, options, assistant);
+        });
+    }
+    /**
+     * Execute an instruction using an assistant
+     *
+     * This method is called by Stencila when executing `InstructionBlock` and
+     * `InstructionInline` nodes.
+     *
+     * It receives a `GenerateTask` and `GenerateOptions` and should return
+     * a `GenerateOutput`. This default implementation raises an error.
+     *
+     * @param task The task to execute
+     * @param options Options for generation
+     * @param assistant The id of the assistant that should execute the task
+     *
+     * @return GenerateOutput
+     */
+    assistantExecute(task, options, assistant) {
+        return __awaiter(this, void 0, void 0, function* () {
+            throw new Error("Method `assistantExecute` must be implemented by plugins that provide an assistant");
+        });
+    }
+    /**
+     * JSON-RPC interface for `assistantExecute`
+     *
+     * @param {Object}
+     * @param task The task to execute
+     * @param options Options for generation
+     * @param assistant The id of the assistant that should execute the task
+     *
+     * @return GenerateOutput
+     */
+    assistant_execute({ task, options, assistant, }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.assistantExecute(task, options, assistant);
+        });
+    }
+    /**
      * Handle a JSON-RPC request and return a JSON-RPC response
      */
     handleRequest(requestJson) {
@@ -399,10 +471,10 @@ class Plugin {
             }
             function successResponse(id, result) {
                 // Result must always be defined (i.e. not `undefined`) for success responses
-                return JSON.stringify({ id, result: result !== null && result !== void 0 ? result : null });
+                return JSON.stringify({ jsonrpc: "2.0", id, result: result !== null && result !== void 0 ? result : null });
             }
             function errorResponse(id, code, message) {
-                return JSON.stringify({ id, error: { code, message } });
+                return JSON.stringify({ jsonrpc: "2.0", id, error: { code, message } });
             }
         });
     }
@@ -502,24 +574,63 @@ exports.Plugin = Plugin;
  * An example Stencila plugin written in Node.js
  */
 class ExamplePlugin extends Plugin {
+    // An echoing kernel which echos back the supplied code as a string output
     kernelInfo() {
         return __awaiter(this, void 0, void 0, function* () {
-            return (0, types_1.softwareApplication)("allcaps");
+            return (0, types_1.softwareApplication)("echo");
         });
     }
     kernelExecute(code) {
         return __awaiter(this, void 0, void 0, function* () {
             return {
-                outputs: [code.toUpperCase()],
+                outputs: [code],
                 messages: [],
             };
         });
     }
-    kernelEvaluate(code) {
+    // An echoing assistant which echos back the task as a JSON code block
+    // and the rendered system prompt as a Markdown code block
+    assistantSystemPrompt() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return `
+You are an assistant that echos back the task given to you.
+
+This system prompt is a template which is rendered against the
+task itself. Here are some of the parts of the task rendered into
+the system prompt:
+
+Instruction:
+
+{{ instruction | to_yaml }}
+
+Instruction text:
+
+{{ instruction_text }}
+
+Instruction content formatted:
+
+{{ content_formatted if content_formatted else "none" }}
+
+Document context:
+
+{{ context | to_yaml }}
+`;
+        });
+    }
+    assistantExecute(task) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             return {
-                output: code.toUpperCase(),
-                messages: [],
+                nodes: [
+                    new types_1.Heading(1, [new types_1.Text("Task")]),
+                    new types_1.CodeBlock(JSON.stringify(task, null, " "), {
+                        programmingLanguage: "json",
+                    }),
+                    new types_1.Heading(1, [new types_1.Text("System prompt")]),
+                    new types_1.CodeBlock((_a = task.system_prompt) !== null && _a !== void 0 ? _a : "", {
+                        programmingLanguage: "markdown",
+                    }),
+                ],
             };
         });
     }
