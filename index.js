@@ -420,24 +420,24 @@ class Plugin {
      *
      * @return GenerateOutput
      */
-    assistantExecute(task, options, assistant) {
+    assistantPerformTask(task, options, assistant) {
         return __awaiter(this, void 0, void 0, function* () {
-            throw new Error("Method `assistantExecute` must be implemented by plugins that provide an assistant");
+            throw new Error("Method `assistantPerformTask` must be implemented by plugins that provide an assistant");
         });
     }
     /**
-     * JSON-RPC interface for `assistantExecute`
+     * JSON-RPC interface for `assistantPerformTask`
      *
      * @param {Object}
-     * @param task The task to execute
+     * @param task The task to perform
      * @param options Options for generation
-     * @param assistant The id of the assistant that should execute the task
+     * @param assistant The id of the assistant that should perform the task
      *
      * @return GenerateOutput
      */
-    assistant_execute({ task, options, assistant, }) {
+    assistant_perform_task({ task, options, assistant, }) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.assistantExecute(task, options, assistant);
+            return yield this.assistantPerformTask(task, options, assistant);
         });
     }
     /**
@@ -617,7 +617,7 @@ Document context:
 `;
         });
     }
-    assistantExecute(task) {
+    assistantPerformTask(task) {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
             return {

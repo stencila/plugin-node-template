@@ -600,27 +600,27 @@ export abstract class Plugin {
    *
    * @return GenerateOutput
    */
-  protected async assistantExecute(
+  protected async assistantPerformTask(
     task: GenerateTask,
     options: GenerateOptions,
     assistant: AssistantId
   ): Promise<GenerateOutput> {
     throw new Error(
-      "Method `assistantExecute` must be implemented by plugins that provide an assistant"
+      "Method `assistantPerformTask` must be implemented by plugins that provide an assistant"
     );
   }
 
   /**
-   * JSON-RPC interface for `assistantExecute`
+   * JSON-RPC interface for `assistantPerformTask`
    *
    * @param {Object}
-   * @param task The task to execute
+   * @param task The task to perform
    * @param options Options for generation
-   * @param assistant The id of the assistant that should execute the task
+   * @param assistant The id of the assistant that should perform the task
    *
    * @return GenerateOutput
    */
-  protected async assistant_execute({
+  protected async assistant_perform_task({
     task,
     options,
     assistant,
@@ -629,7 +629,7 @@ export abstract class Plugin {
     options: GenerateOptions;
     assistant: AssistantId;
   }): Promise<GenerateOutput> {
-    return await this.assistantExecute(task, options, assistant);
+    return await this.assistantPerformTask(task, options, assistant);
   }
 
   /**
@@ -818,7 +818,7 @@ Document context:
 `;
   }
 
-  async assistantExecute(task: GenerateTask) {
+  async assistantPerformTask(task: GenerateTask) {
     return {
       nodes: [
         new Heading(1, [new Text("Task")]),
