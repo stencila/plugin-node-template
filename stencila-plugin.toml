@@ -1,6 +1,6 @@
 name = "node-template"
 version = "0.1.0"
-description = "Example of a plugin written in Node.js"
+description = "Template for Stencila plugin written in Node.js"
 home = "https://github.com/stencila/plugin-node-template"
 install = "https://github.com/stencila/plugin-node-template"
 runtime = "node>=16"
@@ -15,3 +15,4 @@ name = "stencila/echo-node"
 title = "Node.js Echo Assistant"
 content-format = "markdown"
 system-prompt = true
+delegates = false

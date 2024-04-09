@@ -19,6 +19,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@stencila/types": "^2.0.0-alpha.24"
+    "@stencila/plugin": "^2.0.0-alpha.1",
+    "@stencila/types": "^2.0.0-alpha.25"
   }
 }
