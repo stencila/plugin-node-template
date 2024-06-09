@@ -15,4 +15,4 @@ name = "stencila/echo-node"
 title = "Node.js Echo Assistant"
 content-format = "markdown"
 system-prompt = true
-delegates = false
+models = false
